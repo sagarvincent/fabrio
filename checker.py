@@ -12,15 +12,14 @@ class checker():
 
         # check the layers of the target model using a recursive function
         
-
     # function to check if the faces of the model are incorrect with respect to the target
+    # [Returns - an array containing an array for each face, each of which gives the arial and dim deviation]
     def face_check(self, attempt1):    
         faces = attempt1['faces']
-        face_stats = []
-        face_stats.append('volume')
         t_faces = self.target['faces']
-        print(len(t_faces))
-        print(len(faces))
+        face_stats = []
+        face_stats.append(attempt1['volume'])
+        
         if len(faces) == len(t_faces):
             for face in range(len(faces)):
 
@@ -58,8 +57,9 @@ class checker():
 
                 # append to array
                 face_stats.append([per_dev_ar])
-            else:
-                face_stats = []
+        else:
+            for face in range(len(faces)):
+                face_stats.append([100,100])
         
         return face_stats
 
@@ -72,7 +72,6 @@ class checker():
         min = 100
         correct_model = 0
         for each in file_stat:
-            print(each)
             i = i + 1    
             if abs(each[0]-self.target['volume']) < min :
                 min = abs(each[0]-self.target['volume'])
@@ -80,9 +79,7 @@ class checker():
         
         return min, correct_model
             
-
-
-    # correction checking function
+    # correction checking function [Returns - inc_face_no, correct_model]
     def check(self, files):
 
         # no. of faces incorrect with respect to target model
@@ -94,16 +91,15 @@ class checker():
         file_stats = []
 
         for file in files:
-            print(type(file))
             key = list(file.keys())[0]
             file = file[key]
-            face_stats = self.face_check(file)
+            face_stats = self.face_check(file) # [Returns - a list with face stats]
             file_stats.append(face_stats)
 
         # get the no. of incorrect faces for each attempt
-        correct_model = self.get_closest(file_stats)
+        min,correct_model = self.get_closest(file_stats) # [Input - list of list with face stats ]
         
-        return inc_face_no, correct_model
+        return inc_face_no, correct_model, min
 
 
 
