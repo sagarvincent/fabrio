@@ -4,4 +4,5 @@ This repo contains the code for checking and identifying the correct model with 
   1. Check if the no. of faces of the attempt is the same as the no. of faces of the target model
   2. Check the difference between areas of the corresponding faces.
   3. decide on a threshold for the difference between volume.<br />
+<br />
 First, we shortlist the models that have the same no. of faces as the target model. Then, we will select the model as follows: The models are further shortlisted if the volume difference is below a threshold. Among these, the models are ranked based on the cumulative error in corresponding faces and the cumulative error in the bounding box dimension. Then the best model is selected from the two tables based on a selection algorithm.
