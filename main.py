@@ -16,13 +16,12 @@ data_list = data_loader.load_data()
 target = data_list.pop(len(data_list)-1)
 checker = checker.checker(target)
 
+
 # check if the data is correct
-inc_face_no, correct_model, min = checker.check(data_list)
+correct_model, min = checker.check(data_list)
 
 # output and print the feed back 
 print(f"The correct model is attempt no: {correct_model}")
-print(min)
-
 
 
 

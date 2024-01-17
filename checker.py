@@ -1,4 +1,5 @@
 import math
+import misc
 
 
 class checker():
@@ -50,6 +51,7 @@ class checker():
                     
                     dim_att = pow((bb_max_tar[i] - bb_min_tar[i]),2)
                     dim_tar = dim_tar + dim_att
+
                 dim_tar = math.sqrt(dim_tar)
 
                 # compare the dimension of two models & calculate the deviation from the target
@@ -58,48 +60,69 @@ class checker():
                 # append to array
                 face_stats.append([per_dev_ar])
         else:
-            for face in range(len(faces)):
-                face_stats.append([100,100])
-        
+            pass
+            # for face in range(len(faces)):
+            #    face_stats.append([100,100])
+    
         return face_stats
 
     # function to check the correct model
     # <-- model is identified having least difference in volume -->
-    def get_closest(self, file_stat):
+    def get_closest(self, file_stat, file_attr):
 
-        small_diff = 0
         i = 0
-        min = 100
+        min = 0.0002
+        vol_models = []
         correct_model = 0
+        # shortlist based on volume difference
         for each in file_stat:
             i = i + 1    
             if abs(each[0]-self.target['volume']) < min :
                 min = abs(each[0]-self.target['volume'])
-                correct_model = i
+                vol_models.append(i)
+
+        # rank list based on face area error
+        prim_prior = misc.attribute_sort(file_attr,1)
+        sec_prior = misc.attribute_sort(file_attr,2)
+
+        correct_model = misc.two_rank_selection(prim_prior,sec_prior)            
         
         return min, correct_model
-            
+
+
+    # function to calculate cumulative area and bbdim error
+    def cum_error(self,no, face_stats):
+        cum_error = [no,0,0]
+        for i in range(1,len(face_stats)):
+            face = face_stats[i]
+            cum_error[1] =  cum_error[1] + face[0][0]
+            cum_error[2] = cum_error[2] + face[0][1]
+        return cum_error
+
     # correction checking function [Returns - inc_face_no, correct_model]
     def check(self, files):
 
-        # no. of faces incorrect with respect to target model
-        inc_face_no = 0
-        # percentage deviation of each face of the given attempt
-        per_dev = []
-        
         # create an array to store the stats of each model
         file_stats = []
+        # create an array to store the attributes of each model
+        file_attr = []
 
+        fileno = 0
         for file in files:
+            fileno= fileno + 1
             key = list(file.keys())[0]
             file = file[key]
             face_stats = self.face_check(file) # [Returns - a list with face stats]
             file_stats.append(face_stats)
-
-        # get the no. of incorrect faces for each attempt
-        min,correct_model = self.get_closest(file_stats) # [Input - list of list with face stats ]
+            file_attr.append(self.cum_error(fileno,face_stats))
+        # check if the list contains only one model.
+        if len(file_stats) > 1:
+            # get the no. of incorrect faces for each attempt 
+            min,correct_model = self.get_closest(file_stats, file_attr) # [Input - list of list with face stats ]
+        else:
+            pass
         
-        return inc_face_no, correct_model, min
+        return  correct_model, min
 
 
 
