@@ -38,6 +38,22 @@ def attribute_sort(elem_list, attr_ind):
     return elem_list
 
 
+def check_length(list1):
+
+    for i in range(len(list1)):
+
+        count = 0
+        model = 0
+        if len(list1[i])>1:
+            count = count + 1
+            model = i+1
+        
+    if count >1:
+        return True,model
+    else: 
+        return False, model
+
+
 
 
 

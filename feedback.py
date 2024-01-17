@@ -1,17 +1,21 @@
 
 
-# feedback function
-def give_feedback():
+# feedback class
+class feedback():
 
-    feedback =""
+    def __init__(self):
+        self.feedback=""
 
-    # feed back regarding no. of faces
+    def give_feedback(self, feedback):
 
-    # feed back regarding the volume difference
+        self.feedback =self.feedback + feedback
 
-    # feed back regarding the cumilative difference in face area and face bounding box dimension
+    def get_feedback(self):
 
-    return feedback
+        return self.feedback
+    
+
+    
 
 
 

@@ -1,5 +1,6 @@
 import math
 import misc
+import feedback
 
 
 class checker():
@@ -10,12 +11,13 @@ class checker():
         # target data persists as long as the object persist
         tkey = list(target.keys())[0]
         self.target = target[tkey]
+        self.feedback = feedback.feedback()
 
         # check the layers of the target model using a recursive function
         
     # function to check if the faces of the model are incorrect with respect to the target
     # [Returns - an array containing an array for each face, each of which gives the arial and dim deviation]
-    def face_check(self, attempt1):    
+    def face_check(self,fileno, attempt1):    
         faces = attempt1['faces']
         t_faces = self.target['faces']
         face_stats = []
@@ -60,9 +62,10 @@ class checker():
                 # append to array
                 face_stats.append([per_dev_ar])
         else:
-            pass
-            # for face in range(len(faces)):
-            #    face_stats.append([100,100])
+            # feed back regarding no. of faces
+            ff = f"The attempt no. {fileno} is not correct as the no. of faces doesn't match the no. of faces in the target model and is disregarded.\n "
+            self.feedback.give_feedback(ff)
+
     
         return face_stats
 
@@ -74,12 +77,26 @@ class checker():
         min = 0.0002
         vol_models = []
         correct_model = 0
+        # feed back regarding the volume difference
+        f="Only the following attempts have volume difference within the threshold: "
         # shortlist based on volume difference
         for each in file_stat:
             i = i + 1    
             if abs(each[0]-self.target['volume']) < min :
                 min = abs(each[0]-self.target['volume'])
                 vol_models.append(i)
+                f = f + f" {i}"
+
+        # feed back regarding the cumilative difference in face area and face bounding box dimension
+        f2 = "\nThe cumulative differences in area and bounding box dimension are : \n" 
+        for mod in vol_models:
+            for modd in file_attr:
+                if mod == modd[0]:
+                    f2 = f2 + f" attempt no: {mod}, cumulative area error: {modd[1]}, cumulative boudning box error: {modd[2]}"
+
+        self.feedback.give_feedback(f)
+        self.feedback.give_feedback(f2)
+
 
         # rank list based on face area error
         prim_prior = misc.attribute_sort(file_attr,1)
@@ -87,7 +104,7 @@ class checker():
 
         correct_model = misc.two_rank_selection(prim_prior,sec_prior)            
         
-        return min, correct_model
+        return correct_model
 
 
     # function to calculate cumulative area and bbdim error
@@ -112,17 +129,19 @@ class checker():
             fileno= fileno + 1
             key = list(file.keys())[0]
             file = file[key]
-            face_stats = self.face_check(file) # [Returns - a list with face stats]
+            face_stats = self.face_check(fileno,file) # [Returns - a list with face stats]
             file_stats.append(face_stats)
             file_attr.append(self.cum_error(fileno,face_stats))
-        # check if the list contains only one model.
-        if len(file_stats) > 1:
-            # get the no. of incorrect faces for each attempt 
-            min,correct_model = self.get_closest(file_stats, file_attr) # [Input - list of list with face stats ]
-        else:
-            pass
         
-        return  correct_model, min
+        # check if the list contains only one model.
+        #t,correct_model= (misc.check_length(file_stats))
+        if True:
+            # get the no. of incorrect faces for each attempt 
+           correct_model = self.get_closest(file_stats, file_attr) # [Input - list of list with face stats ]
+        
+            
+        fin_feedback = self.feedback.get_feedback()
+        return  correct_model, fin_feedback
 
 
 

@@ -18,10 +18,12 @@ checker = checker.checker(target)
 
 
 # check if the data is correct
-correct_model, min = checker.check(data_list)
+correct_model,final_feedback = checker.check(data_list)
 
 # output and print the feed back 
 print(f"The correct model is attempt no: {correct_model}")
+print("The final feedback is as the follows \n")
+print(final_feedback)
 
 
 
