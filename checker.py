@@ -62,8 +62,11 @@ class checker():
                 # append to array
                 face_stats.append([per_dev_ar])
         else:
+            flen = len(faces)
+            tlen = len(t_faces)
             # feed back regarding no. of faces
-            ff = f"The attempt no. {fileno} is not correct as the no. of faces doesn't match the no. of faces in the target model and is disregarded.\n "
+            ff = f"The attempt no. {fileno} is not correct as the no. of faces doesn't match the no. of faces in the target model and is disregarded."
+            ff = ff + f" The attempt {fileno} has a difference of { abs(tlen-flen)} in no. of faces \n"
             self.feedback.give_feedback(ff)
 
     
@@ -134,11 +137,14 @@ class checker():
             file_attr.append(self.cum_error(fileno,face_stats))
         
         # check if the list contains only one model.
-        #t,correct_model= (misc.check_length(file_stats))
-        if True:
+        t,correct_model= (misc.check_length(file_stats))
+        if t:
             # get the no. of incorrect faces for each attempt 
            correct_model = self.get_closest(file_stats, file_attr) # [Input - list of list with face stats ]
-        
+        else:
+            self.feedback.give_feedback("There is only one model that has matching no. of faces with the target model,")
+            self.feedback.give_feedback(" therefore volume, face areas and bounding box information are not checked.")
+            self.feedback.give_feedback(f" The correct model is {correct_model}")       
             
         fin_feedback = self.feedback.get_feedback()
         return  correct_model, fin_feedback
